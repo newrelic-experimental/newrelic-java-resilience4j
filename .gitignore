@@ -1,3 +1,9 @@
 .java-version
 .git
 .github
+build
+bin
+.DS_Store
+.classpath
+.project
+.settings
