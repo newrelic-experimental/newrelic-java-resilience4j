@@ -1,13 +1,9 @@
-
-// Build.gradle generated for instrumentation module resilience4j-circuitbreaker
+// Build.gradle generated for instrumentation module resilience4j-timelimiter_1.5
 
 apply plugin: 'java'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
-
 dependencies {
-   implementation 'io.github.resilience4j:resilience4j-circuitbreaker:1.0.0'
+   implementation 'io.github.resilience4j:resilience4j-timelimiter:1.5.0'
 
    // New Relic Java Agent dependencies
    implementation 'com.newrelic.agent.java:newrelic-agent:6.4.0'
@@ -18,7 +14,7 @@ dependencies {
 
 jar {
   manifest {
-    attributes 'Implementation-Title': 'com.newrelic.instrumentation.labs.resilience4j-circuitbreaker-1.0'
+    attributes 'Implementation-Title': 'com.newrelic.instrumentation.labs.resilience4j-timelimiter_1.5'
     attributes 'Implementation-Vendor': 'New Relic Labs'
     attributes 'Implementation-Vendor-Id': 'com.newrelic.labs'
     attributes 'Implementation-Version': 1.0
@@ -26,5 +22,5 @@ jar {
 }
 
 verifyInstrumentation {
-	passes 'io.github.resilience4j:resilience4j-circuitbreaker:[1.0.0,1.7.0)'
+  passes 'io.github.resilience4j:resilience4j-timelimiter:[1.5.0,2.0.0)'
 }
