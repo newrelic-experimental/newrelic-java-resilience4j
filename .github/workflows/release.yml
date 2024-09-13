@@ -1,4 +1,4 @@
-name: Build and Release (Manual Run) v1.4 [ No ChangeLogs]
+name: Build and Release (Manual Run) v1.4 [ JDK-17 No ChangeLogs]
 
 on: 
  workflow_dispatch: # This event allows manual triggering
@@ -13,10 +13,10 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 8
+          java-version: 17
           distribution: 'temurin'
 
       - name: Set Extensions Dir
