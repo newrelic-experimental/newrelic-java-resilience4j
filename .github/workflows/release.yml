@@ -1,4 +1,4 @@
-name: Build and Release (Manual Run) v1.4 [ Bo ChangeLogs]
+name: Build and Release (Manual Run) v1.4 [ No ChangeLogs]
 
 on: 
  workflow_dispatch: # This event allows manual triggering
