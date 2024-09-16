@@ -12,6 +12,7 @@ import com.newrelic.agent.config.AgentConfig;
 import com.newrelic.agent.config.AgentConfigListener;
 import com.newrelic.agent.config.ConfigService;
 import com.newrelic.agent.service.ServiceFactory;
+import com.newrelic.api.agent.Config;
 import com.newrelic.api.agent.NewRelic;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -32,6 +33,7 @@ public class MetricsCollector implements AgentConfigListener {
 	}
 
 	public static void addCircuitBreaker(CircuitBreaker circuitBreaker) {
+		NewRelic.getAgent().getLogger().log(Level.FINE, "Call to add CircuitBreaker {0} to list to collect metrics from", circuitBreaker);
 		if(!initialized) {
 			init();
 		}
@@ -42,6 +44,7 @@ public class MetricsCollector implements AgentConfigListener {
 	}
 
 	private static void setupCollector() {
+		NewRelic.getAgent().getLogger().log(Level.FINE, "Call to setup CircuitBreaker Metrics Collector, enabled = {0}, interval = {1}", enabled, interval);
 		if(future != null) {
 			future.cancel(true);
 			future = null;
@@ -55,6 +58,8 @@ public class MetricsCollector implements AgentConfigListener {
 	private static void init() {
 		ConfigService configService = ServiceFactory.getConfigService();
 		configService.addIAgentConfigListener(new MetricsCollector());
+		Config config = NewRelic.getAgent().getConfig();
+		setValues(config, MetricsCollector.class);
 		setupCollector();
 		initialized = true;
 	}
@@ -86,10 +91,10 @@ public class MetricsCollector implements AgentConfigListener {
 		}
 	}
 
-
-	@Override
-	public void configChanged(String appName, AgentConfig agentConfig) {
-		Object obj = agentConfig.getValue(CIRCUITBREAKERMETRICSENABLED);
+	private static boolean setValues(Config config, Class<?> clazz) {
+		
+		Object obj = config.getValue(CIRCUITBREAKERMETRICSENABLED);
+		NewRelic.getAgent().getLogger().log(Level.FINE, "Call to {0}.configChanged, got value for {1} of {2}",clazz, CIRCUITBREAKERMETRICSENABLED, obj);
 		boolean configPresent = false;
 		if(obj != null) {
 			configPresent = true;
@@ -105,7 +110,8 @@ public class MetricsCollector implements AgentConfigListener {
 			}
 		}
 		
-		obj = agentConfig.getValue(CIRCUITBREAKERMETRICSINTERVAL);
+		obj = config.getValue(CIRCUITBREAKERMETRICSINTERVAL);
+		NewRelic.getAgent().getLogger().log(Level.FINE, "Call to {0}.configChanged, got value for {1} of {2}",clazz, CIRCUITBREAKERMETRICSINTERVAL, obj);
 		if(obj != null) {
 			configPresent = true;
 			if(obj instanceof Long) {
@@ -119,6 +125,12 @@ public class MetricsCollector implements AgentConfigListener {
 				}
 			}
 		}
+		return configPresent;
+	}
+	
+	@Override
+	public void configChanged(String appName, AgentConfig agentConfig) {
+		boolean configPresent = setValues(agentConfig, getClass());
 		if(configPresent) {
 			setupCollector();
 		}
