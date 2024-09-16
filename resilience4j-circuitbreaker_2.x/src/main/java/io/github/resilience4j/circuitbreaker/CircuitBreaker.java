@@ -10,7 +10,9 @@ import com.newrelic.api.agent.Trace;
 import com.newrelic.api.agent.TracedMethod;
 import com.newrelic.api.agent.weaver.MatchType;
 import com.newrelic.api.agent.weaver.Weave;
+import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
+import com.newrelic.instruementation.labs.circuitbreaker.MetricsCollector;
 
 import io.github.resilience4j.core.functions.CheckedRunnable;
 import io.github.resilience4j.core.functions.CheckedSupplier;
@@ -19,6 +21,12 @@ import io.github.resilience4j.core.functions.CheckedSupplier;
 public abstract class CircuitBreaker {
 
 	public abstract String getName();
+	public abstract Metrics getMetrics();
+	
+	@WeaveAllConstructors
+	public CircuitBreaker() {
+		MetricsCollector.addCircuitBreaker(this);
+	}
 	
 	@Trace
 	public <T> T executeCallable(Callable<T> callable)  {
@@ -84,4 +92,27 @@ public abstract class CircuitBreaker {
 		traced.addCustomAttribute("durationUnit", durationUnit.name());
 		Weaver.callOriginal();
 	}
+	
+	@Weave(type=MatchType.Interface)
+	public static abstract class Metrics {
+		
+        public abstract float getFailureRate();
+
+        public abstract float getSlowCallRate();
+
+        public abstract int getNumberOfSlowCalls();
+
+        public abstract int getNumberOfBufferedCalls();
+
+        public abstract int getNumberOfFailedCalls();
+
+        public abstract long getNumberOfNotPermittedCalls();
+
+        public abstract int getNumberOfSuccessfulCalls();
+        
+        public abstract int getNumberOfSlowSuccessfulCalls();
+
+        public abstract int getNumberOfSlowFailedCalls();
+	}
+
 }

@@ -1,4 +1,4 @@
-name: Build and Release (Manual Run) v1.3
+name: Build and Release (Manual Run) v1.4 [ JDK-17 No ChangeLogs]
 
 on: 
  workflow_dispatch: # This event allows manual triggering
@@ -13,13 +13,11 @@ jobs:
         with:
           fetch-depth: 0
           
-
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 8
+          java-version: 17
           distribution: 'temurin'
-
 
       - name: Set Extensions Dir
         id: set_ext_dir
@@ -103,9 +101,7 @@ jobs:
           zip -r /tmp/to/${{ env.RELEASE_NAME}}${{ steps.set_tag.outputs.tag }}.zip *.jar
           cd ${{env.CURRENT}}
 
-      
-
-      - name: Create Release
+            - name: Create Release
         id: create_release
         uses: actions/github-script@v6
         with:
@@ -116,14 +112,14 @@ jobs:
                 var tag = '' + `${{ steps.set_tag.outputs.tag }}`;
                 const archivePath = '/tmp/to/${{ env.RELEASE_NAME}}${{ steps.set_tag.outputs.tag }}.zip';
                 var response = await github.rest.repos.createRelease({
-                  draft:false,
-                  generate_release_notes:true,
-                  name:tag,
-                  owner:context.repo.owner,
-                  prerelease:false,
-                  repo:context.repo.repo,
-                  tag_name:tag,
-                  body:changelog
+                  draft: false,
+                  generate_release_notes: true,
+                  name: tag,
+                  owner: context.repo.owner,
+                  prerelease: false,
+                  repo: context.repo.repo,
+                  tag_name: tag,
+                  body: changelog
                 });
 
                 core.exportVariable('RELEASE_ID', response.data.id);
@@ -132,6 +128,7 @@ jobs:
               } catch (error) {
                 core.setFailed(error.message);
               }
+
       - name: Upload Release Artifacts
         uses: actions/upload-release-asset@v1
         env:
@@ -141,44 +138,7 @@ jobs:
           asset_name: ${{ env.RELEASE_NAME}}${{ steps.set_tag.outputs.tag }}.zip
           upload_url: ${{ env.RELEASE_UPLOAD_URL }}
           asset_content_type: application/zip
-     
-      - name: "Generate release changelog"
-        id: github_changelog
-        uses: Helmisek/conventional-changelog-generator@v1.0.6-release
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          commit-types: "fix:Bug Fixes,feat:Features,doc:Documentation,build:Build Upgrades,BREAKING CHANGE:Enhancements"
-          template-path: ".github/workflows/CHANGELOG.tpl.md"
-         
-     
-      - name: update CHANGELOG.md
-        run: |
-          # Content to add at the top
-          # Get the current date in YYYY-MM-DD format
-          release_date=$(date +"%Y-%m-%d")
-          version="## Version: [${{env.RELEASE_VERSION}}](${{ env.RELEASE_URL }}) | Created: $release_date"
-          content="$version${{steps.github_changelog.outputs.changelog}}"
 
-          # Existing file
-          file="CHANGELOG.md"
-
-          # Create a temporary file with the content at the top and existing content below
-          
-          echo "$content" > temp_file.txt
-          cat "$file" >> temp_file.txt
-
-          # Overwrite the original file with the updated content
-          mv temp_file.txt "$file"
-          
-          # Commit the updated CHANGELOG.md file
-           git add CHANGELOG.md
-           git config --local user.email "action@github.com"
-           git config --local user.name "GitHub Action"
-           git commit -m "Update Changelog for Release [skip ci]"
-
-          # Push the changes to the remote repository
-           git push --quiet --set-upstream origin HEAD
-      
       - name: Get Compare URL
         run: |
             compare=$(echo ${{ env.RELEASE_URL }} | sed 's/releases\/tag.*/compare/')
@@ -192,20 +152,18 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             try {
-                
-                
-                var changelog = `${{steps.github_changelog.outputs.changelog}}` + `${{env.COMPAREURL}}` ;
+                var changelog = `${{env.COMPAREURL}}`;
                 var release_id = `${{env.RELEASE_ID}}`;
                 var tag = '' + `${{ steps.set_tag.outputs.tag }}`;
                 const archivePath = '/tmp/to/${{ env.RELEASE_NAME}}${{ steps.set_tag.outputs.tag }}.zip';
                 var _response = await github.rest.repos.updateRelease({
-                  draft:false,
-                  generate_release_notes:true,
-                  owner:context.repo.owner,
+                  draft: false,
+                  generate_release_notes: true,
+                  owner: context.repo.owner,
                   repo: context.repo.repo,
-                  prerelease:false,
-                  release_id:release_id,
-                  body:changelog
+                  prerelease: false,
+                  release_id: release_id,
+                  body: changelog
                 });
 
                 core.exportVariable('RELEASE_ID', _response.data.id);
