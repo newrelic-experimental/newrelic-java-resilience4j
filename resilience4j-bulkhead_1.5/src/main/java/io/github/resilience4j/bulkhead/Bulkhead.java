@@ -25,70 +25,70 @@ public abstract class Bulkhead {
 
 	public abstract String getName();
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> T executeCallable(Callable<T> callable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"executeCallable");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> T executeCheckedSupplier(CheckedFunction0<T> checkedSupplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"executeCheckedSupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> CompletionStage<T> executeCompletionStage(Supplier<CompletionStage<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"executeCompletionStage");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public void executeRunnable(Runnable runnable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"executeRunnable");
 		Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> T executeSupplier(Supplier<T> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"executeSupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> Try<T> executeTrySupplier(Supplier<Try<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"executeTrySupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> Either<Exception, T> executeEitherSupplier(Supplier<Either<? extends Exception, T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"executeEitherSupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public void onComplete() {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"onComplete");
 		Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public void changeConfig(BulkheadConfig newConfig) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"changeConfig");
 		Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public BulkheadConfig getBulkheadConfig() {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"getBulkheadConfig");
@@ -96,14 +96,14 @@ public abstract class Bulkhead {
 	}
 
 	// Static methods
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> CheckedFunction0<T> decorateCheckedSupplier(Bulkhead bulkhead, CheckedFunction0<T> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateCheckedSupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> Supplier<CompletionStage<T>> decorateCompletionStage(Bulkhead bulkhead,
 			Supplier<CompletionStage<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
@@ -111,42 +111,42 @@ public abstract class Bulkhead {
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> Supplier<Future<T>> decorateFuture(Bulkhead bulkhead, Supplier<Future<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateFuture");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static CheckedRunnable decorateCheckedRunnable(Bulkhead bulkhead, CheckedRunnable runnable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateCheckedRunnable");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> Callable<T> decorateCallable(Bulkhead bulkhead, Callable<T> callable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateCallable");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> Supplier<T> decorateSupplier(Bulkhead bulkhead, Supplier<T> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateSupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> Supplier<Try<T>> decorateTrySupplier(Bulkhead bulkhead, Supplier<Try<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateTrySupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> Supplier<Either<Exception, T>> decorateEitherSupplier(Bulkhead bulkhead,
 			Supplier<Either<? extends Exception, T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
@@ -154,35 +154,35 @@ public abstract class Bulkhead {
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> Consumer<T> decorateConsumer(Bulkhead bulkhead, Consumer<T> consumer) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateConsumer");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T> CheckedConsumer<T> decorateCheckedConsumer(Bulkhead bulkhead, CheckedConsumer<T> consumer) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateCheckedConsumer");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static Runnable decorateRunnable(Bulkhead bulkhead, Runnable runnable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateRunnable");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T, R> Function<T, R> decorateFunction(Bulkhead bulkhead, Function<T, R> function) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateFunction");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T, R> CheckedFunction1<T, R> decorateCheckedFunction(Bulkhead bulkhead,
 			CheckedFunction1<T, R> function) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
