@@ -8,12 +8,21 @@ import com.newrelic.api.agent.NewRelic;
 import com.newrelic.api.agent.Trace;
 import com.newrelic.api.agent.weaver.MatchType;
 import com.newrelic.api.agent.weaver.Weave;
+import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
+import com.newrelic.instrumentation.labs.bulkhead.ThreadPoolBulkheadMetricsCollector;
 
 @Weave(type = MatchType.Interface)
 public abstract class ThreadPoolBulkhead implements AutoCloseable {
 
+	@WeaveAllConstructors
+	public ThreadPoolBulkhead() {
+		ThreadPoolBulkheadMetricsCollector.addThreadPoolBulkhead(this);
+	}
+
 	public abstract String getName();
+
+	public abstract Metrics getMetrics();
 
 	@Trace
 	public <T> CompletionStage<T> submit(Callable<T> task) {
@@ -98,6 +107,23 @@ public abstract class ThreadPoolBulkhead implements AutoCloseable {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "ThreadPoolBulkhead",
 				bulkhead.getName(), "decorateRunnable");
 		return Weaver.callOriginal();
+	}
+
+	@Weave(type = MatchType.Interface)
+	public static abstract class Metrics {
+
+		public abstract int getCoreThreadPoolSize();
+
+		public abstract int getThreadPoolSize();
+
+		public abstract int getMaximumThreadPoolSize();
+
+		public abstract int getQueueDepth();
+
+		public abstract int getRemainingQueueCapacity();
+
+		public abstract int getQueueCapacity();
+
 	}
 
 }

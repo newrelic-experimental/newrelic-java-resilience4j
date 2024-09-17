@@ -11,7 +11,9 @@ import com.newrelic.api.agent.NewRelic;
 import com.newrelic.api.agent.Trace;
 import com.newrelic.api.agent.weaver.MatchType;
 import com.newrelic.api.agent.weaver.Weave;
+import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
+import com.newrelic.instrumentation.labs.bulkhead.BulkheadMetricsCollector;
 
 import io.github.resilience4j.core.functions.CheckedConsumer;
 import io.github.resilience4j.core.functions.CheckedFunction;
@@ -22,7 +24,14 @@ import io.github.resilience4j.core.functions.Either;
 @Weave(type = MatchType.Interface)
 public abstract class Bulkhead {
 
+	@WeaveAllConstructors
+	public Bulkhead() {
+		BulkheadMetricsCollector.addBulkhead(this);
+	}
+
 	public abstract String getName();
+
+	public abstract Metrics getMetrics();
 
 	@Trace
 	public <T> T executeCallable(Callable<T> callable) {
@@ -172,6 +181,14 @@ public abstract class Bulkhead {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateCheckedFunction");
 		return Weaver.callOriginal();
+	}
+
+	@Weave(type = MatchType.Interface)
+	public static abstract class Metrics {
+
+		public abstract int getAvailableConcurrentCalls();
+
+		public abstract int getMaxAllowedConcurrentCalls();
 	}
 
 }

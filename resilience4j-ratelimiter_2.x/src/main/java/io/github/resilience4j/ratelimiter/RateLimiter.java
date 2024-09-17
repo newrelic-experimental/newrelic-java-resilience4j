@@ -11,7 +11,9 @@ import com.newrelic.api.agent.NewRelic;
 import com.newrelic.api.agent.Trace;
 import com.newrelic.api.agent.weaver.MatchType;
 import com.newrelic.api.agent.weaver.Weave;
+import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
+import com.newrelic.instrumentation.labs.ratelimiter.RateLimiterMetricsCollector;
 
 import io.github.resilience4j.core.functions.CheckedFunction;
 import io.github.resilience4j.core.functions.CheckedRunnable;
@@ -21,6 +23,13 @@ import io.github.resilience4j.core.functions.CheckedSupplier;
 public abstract class RateLimiter {
 
 	public abstract String getName();
+
+	public abstract Metrics getMetrics();
+
+	@WeaveAllConstructors
+	public RateLimiter() {
+		RateLimiterMetricsCollector.addRateLimiter(this);
+	}
 
 	@Trace
 	public <T> T executeCallable(Callable<T> callable) throws Exception {
@@ -215,4 +224,11 @@ public abstract class RateLimiter {
 		return Weaver.callOriginal();
 	}
 
+	@Weave(type = MatchType.Interface)
+	public static abstract class Metrics {
+
+		public abstract int getNumberOfWaitingThreads();
+
+		public abstract int getAvailablePermissions();
+	}
 }

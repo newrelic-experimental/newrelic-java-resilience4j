@@ -10,7 +10,9 @@ import com.newrelic.api.agent.NewRelic;
 import com.newrelic.api.agent.Trace;
 import com.newrelic.api.agent.weaver.MatchType;
 import com.newrelic.api.agent.weaver.Weave;
+import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
+import com.newrelic.instrumentation.labs.retry.RetryMetricsCollector;
 
 import io.github.resilience4j.core.functions.CheckedFunction;
 import io.github.resilience4j.core.functions.CheckedRunnable;
@@ -20,6 +22,13 @@ import io.github.resilience4j.core.functions.CheckedSupplier;
 public abstract class Retry {
 
 	public abstract String getName();
+
+	public abstract Metrics getMetrics();
+
+	@WeaveAllConstructors
+	public Retry() {
+		RetryMetricsCollector.addRetry(this);
+	}
 
 	@Trace
 	public <T> T executeCallable(Callable<T> callable) throws Exception {
@@ -122,4 +131,15 @@ public abstract class Retry {
 		return Weaver.callOriginal();
 	}
 
+	@Weave(type = MatchType.Interface)
+	public static abstract class Metrics {
+
+		public abstract long getNumberOfSuccessfulCallsWithoutRetryAttempt();
+
+		public abstract long getNumberOfFailedCallsWithoutRetryAttempt();
+
+		public abstract long getNumberOfSuccessfulCallsWithRetryAttempt();
+
+		public abstract long getNumberOfFailedCallsWithRetryAttempt();
+	}
 }
