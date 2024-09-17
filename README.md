@@ -47,29 +47,45 @@ This module also collects and reports metrics from Resilience4j components (Circ
 
 To enable (default: true) /disable specific metrics collection and set the polling interval ( default: 1 minute ) , update the `newrelic.yml` configuration file with the following parameters:
 
-
-
 ```yaml
 # Circuit Breaker Metrics
-Resilience4j.metrics.circuitbreaker.enabled: true
-Resilience4j.metrics.circuitbreaker.intervalminutes: 5
+Resilience4j:
+  metrics:
+    circuitbreaker:
+      enabled: true
+      intervalminutes: 5
 
 # Bulkhead Metrics
-Resilience4j.metrics.bulkhead.enabled: true
-Resilience4j.metrics.bulkhead.intervalminutes: 5
+Resilience4j:
+  metrics:
+    bulkhead:
+      enabled: true
+      intervalminutes: 5
 
 # ThreadPool Bulkhead Metrics
-Resilience4j.metrics.threadpoolbulkhead.enabled: true
-Resilience4j.metrics.threadpoolbulkhead.intervalminutes: 5
+Resilience4j:
+  metrics:
+    threadpoolbulkhead:
+      enabled: true
+      intervalminutes: 5
 
 # Rate Limiter Metrics
-Resilience4j.metrics.ratelimiter.enabled: true
-Resilience4j.metrics.ratelimiter.intervalminutes: 5
+Resilience4j:
+  metrics:
+    ratelimiter:
+      enabled: true
+      intervalminutes: 5
 
 # Retry Metrics
-Resilience4j.metrics.retry.enabled: true
-Resilience4j.metrics.retry.intervalminutes: 5
+Resilience4j:
+  metrics:
+    retry:
+      enabled: true
+      intervalminutes: 5
 ```
+
+These settings should be added to your `newrelic.yml` configuration file. This configuration enables metrics collection for each Resilience4j component and sets the polling interval to 5 minutes. Adjust the `intervalminutes` value as needed to set a different polling interval.
+      
 ### Usage
 **Enable Metrics Collection:** Set the appropriate flags in the newrelic.yml file to enable metrics collection for the desired Resilience4j components.
 
