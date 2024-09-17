@@ -1,4 +1,4 @@
-name: Build and Release (Manual Run) v1.4 [ JDK-17 No ChangeLogs]
+name: Build and Release (Manual Run)v1.4
 
 on: 
  workflow_dispatch: # This event allows manual triggering
