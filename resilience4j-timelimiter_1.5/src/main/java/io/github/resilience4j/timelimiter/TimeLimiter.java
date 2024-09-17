@@ -17,14 +17,14 @@ public abstract class TimeLimiter {
 
 	public abstract String getName();
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T, F extends Future<T>> T executeFutureSupplier(Supplier<F> futureSupplier) throws Exception {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter", getName(),
 				"executeFutureSupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T, F extends CompletionStage<T>> CompletionStage<T> executeCompletionStage(
 			ScheduledExecutorService scheduler, Supplier<F> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter", getName(),
@@ -32,14 +32,14 @@ public abstract class TimeLimiter {
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T, F extends Future<T>> Callable<T> decorateFutureSupplier(Supplier<F> futureSupplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter", getName(),
 				"decorateFutureSupplier");
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public <T, F extends CompletionStage<T>> Supplier<CompletionStage<T>> decorateCompletionStage(
 			ScheduledExecutorService scheduler, Supplier<F> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter", getName(),
@@ -47,14 +47,14 @@ public abstract class TimeLimiter {
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public void onSuccess() {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter", getName(),
 				"onSuccess");
 		Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public void onError(Throwable throwable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter", getName(),
 				"onError");
@@ -64,7 +64,7 @@ public abstract class TimeLimiter {
 
 	// Static methods
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T, F extends Future<T>> Callable<T> decorateFutureSupplier(TimeLimiter timeLimiter,
 			Supplier<F> futureSupplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter",
@@ -72,7 +72,7 @@ public abstract class TimeLimiter {
 		return Weaver.callOriginal();
 	}
 
-	@Trace(dispatcher = true)
+	@Trace
 	public static <T, F extends CompletionStage<T>> Supplier<CompletionStage<T>> decorateCompletionStage(
 			TimeLimiter timeLimiter, ScheduledExecutorService scheduler, Supplier<F> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "TimeLimiter",

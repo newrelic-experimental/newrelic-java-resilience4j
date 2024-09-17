@@ -30,56 +30,56 @@ public abstract class CircuitBreaker {
 		MetricsCollector.addCircuitBreaker(this);
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> T executeCallable(Callable<T> callable)  {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeCallable");
 		return Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public void executeCheckedRunnable(CheckedRunnable runnable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeCheckedRunnable");
 		Weaver.callOriginal();
 	}
 	
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> T executeCheckedSupplier(CheckedFunction0<T> checkedSupplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeCheckedSupplier");
 		return Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> CompletionStage<T> executeCompletionStage(Supplier<CompletionStage<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeCompletionStage");
 		return Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> Either<Exception, T> executeEitherSupplier(Supplier<Either<? extends Exception, T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeEitherSupplier");
 		return Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public void executeRunnable(Runnable runnable) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeCheckedRunnable");
 		Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> T executeSupplier(Supplier<T> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeEitherSupplier");
 		return Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public <T> Try<T> executeTrySupplier(Supplier<Try<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeTrySupplier");
 		return Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public void onError(long duration, TimeUnit durationUnit, Throwable throwable) {
 		TracedMethod traced = NewRelic.getAgent().getTracedMethod();
 		traced.setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"onError");
@@ -89,7 +89,7 @@ public abstract class CircuitBreaker {
 		Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public void onSuccess(long duration, TimeUnit durationUnit) {
 		TracedMethod traced = NewRelic.getAgent().getTracedMethod();
 		traced.setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"onSuccess");
@@ -98,7 +98,7 @@ public abstract class CircuitBreaker {
 		Weaver.callOriginal();
 	}
 	
-	@Trace(dispatcher = true)
+	@Trace
 	public void onResult(long duration, TimeUnit durationUnit, Object result) {
 		TracedMethod traced = NewRelic.getAgent().getTracedMethod();
 		traced.setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"onResult");
