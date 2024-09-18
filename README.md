@@ -48,37 +48,29 @@ This module also collects and reports metrics from Resilience4j components (Circ
 To enable (default: true) /disable specific metrics collection and set the polling interval ( default: 1 minute ) , update the `newrelic.yml` configuration file with the following parameters:
 
 ```yaml
-# Circuit Breaker Metrics
 Resilience4j:
   metrics:
+    # Circuit Breaker Metrics
     circuitbreaker:
       enabled: true
       intervalminutes: 5
 
-# Bulkhead Metrics
-Resilience4j:
-  metrics:
+    # Bulkhead Metrics
     bulkhead:
       enabled: true
       intervalminutes: 5
 
-# ThreadPool Bulkhead Metrics
-Resilience4j:
-  metrics:
+    # ThreadPool Bulkhead Metrics
     threadpoolbulkhead:
       enabled: true
       intervalminutes: 5
 
-# Rate Limiter Metrics
-Resilience4j:
-  metrics:
+    # Rate Limiter Metrics
     ratelimiter:
       enabled: true
       intervalminutes: 5
 
-# Retry Metrics
-Resilience4j:
-  metrics:
+    # Retry Metrics
     retry:
       enabled: true
       intervalminutes: 5
