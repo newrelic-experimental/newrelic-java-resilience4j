@@ -1,5 +1,4 @@
 rootProject.name = 'java-instrumentation-template'
-include 'resilience4j-core'
 include 'resilience4j-circuitbreaker_1.0'
 include 'resilience4j-circuitbreaker_1.7'
 include 'resilience4j-circuitbreaker_2.x'
