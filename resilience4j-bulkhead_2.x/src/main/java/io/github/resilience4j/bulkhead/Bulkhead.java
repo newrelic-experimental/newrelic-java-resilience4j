@@ -19,7 +19,6 @@ import io.github.resilience4j.core.functions.CheckedConsumer;
 import io.github.resilience4j.core.functions.CheckedFunction;
 import io.github.resilience4j.core.functions.CheckedRunnable;
 import io.github.resilience4j.core.functions.CheckedSupplier;
-import io.github.resilience4j.core.functions.Either;
 
 @Weave(type = MatchType.Interface)
 public abstract class Bulkhead {
@@ -69,13 +68,6 @@ public abstract class Bulkhead {
 	}
 
 	@Trace
-	public <T> Either<Exception, T> executeEitherSupplier(Supplier<Either<? extends Exception, T>> supplier) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
-				"executeEitherSupplier");
-		return Weaver.callOriginal();
-	}
-
-	@Trace
 	public void onComplete() {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
 				"onComplete");
@@ -98,7 +90,7 @@ public abstract class Bulkhead {
 
 	// Static methods
 	@Trace
-	static <T> CheckedSupplier<T> decorateCheckedSupplier(Bulkhead bulkhead, CheckedSupplier<T> supplier) {
+	public static <T> CheckedSupplier<T> decorateCheckedSupplier(Bulkhead bulkhead, CheckedSupplier<T> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateCheckedSupplier");
 		return Weaver.callOriginal();
@@ -141,14 +133,6 @@ public abstract class Bulkhead {
 	}
 
 	@Trace
-	public static <T> Supplier<Either<Exception, T>> decorateEitherSupplier(Bulkhead bulkhead,
-			Supplier<Either<? extends Exception, T>> supplier) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
-				"decorateEitherSupplier");
-		return Weaver.callOriginal();
-	}
-
-	@Trace
 	public static <T> Consumer<T> decorateConsumer(Bulkhead bulkhead, Consumer<T> consumer) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateConsumer");
@@ -177,7 +161,7 @@ public abstract class Bulkhead {
 	}
 
 	@Trace
-	static <T, R> CheckedFunction<T, R> decorateCheckedFunction(Bulkhead bulkhead, CheckedFunction<T, R> function) {
+	public static <T, R> CheckedFunction<T, R> decorateCheckedFunction(Bulkhead bulkhead, CheckedFunction<T, R> function) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", bulkhead.getName(),
 				"decorateCheckedFunction");
 		return Weaver.callOriginal();
