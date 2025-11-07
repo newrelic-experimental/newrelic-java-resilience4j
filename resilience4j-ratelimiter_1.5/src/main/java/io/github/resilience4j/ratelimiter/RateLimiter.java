@@ -1,6 +1,7 @@
 package io.github.resilience4j.ratelimiter;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -13,6 +14,8 @@ import com.newrelic.api.agent.weaver.MatchType;
 import com.newrelic.api.agent.weaver.Weave;
 import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
+import com.newrelic.instrumentation.labs.ratelimiter.NRBiConsumer;
+import com.newrelic.instrumentation.labs.ratelimiter.NRHolder;
 import com.newrelic.instrumentation.labs.ratelimiter.RateLimiterMetricsCollector;
 
 import io.vavr.CheckedFunction0;
@@ -49,9 +52,16 @@ public abstract class RateLimiter {
 
 	@Trace
 	public <T> CompletionStage<T> executeCompletionStage(Supplier<CompletionStage<T>> supplier) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "RateLimiter", getName(),
-				"executeCompletionStage");
-		return Weaver.callOriginal();
+		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "RateLimiter", getName(), "executeCompletionStage");
+		NRHolder holder = new NRHolder("RateLimiter/CompletionStage/"+getName());
+		holder.startSegment();
+		CompletionStage<T> result =  Weaver.callOriginal();
+		if(result instanceof CompletableFuture) {
+			CompletableFuture<T> future = (CompletableFuture<T>)result;
+			return future.whenComplete(new NRBiConsumer<>(holder));
+		}
+		holder.ignoreSegment();
+		return result;
 	}
 
 	@Trace

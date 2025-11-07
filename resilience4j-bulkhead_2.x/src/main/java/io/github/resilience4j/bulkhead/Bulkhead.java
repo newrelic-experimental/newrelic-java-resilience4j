@@ -1,6 +1,7 @@
 package io.github.resilience4j.bulkhead;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -15,6 +16,8 @@ import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
 import com.newrelic.instrumentation.labs.bulkhead.BulkheadMetricsCollector;
 
+import com.newrelic.instrumentation.labs.bulkhead.NRBiConsumer;
+import com.newrelic.instrumentation.labs.bulkhead.NRHolder;
 import io.github.resilience4j.core.functions.CheckedConsumer;
 import io.github.resilience4j.core.functions.CheckedFunction;
 import io.github.resilience4j.core.functions.CheckedRunnable;
@@ -48,9 +51,15 @@ public abstract class Bulkhead {
 
 	@Trace
 	public <T> CompletionStage<T> executeCompletionStage(Supplier<CompletionStage<T>> supplier) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
-				"executeCompletionStage");
-		return Weaver.callOriginal();
+		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(), "executeCompletionStage");
+		NRHolder holder = new NRHolder("Bulkhead/"+getName()+"CompletionStage");
+		CompletionStage<T> result = Weaver.callOriginal();
+		if(result instanceof CompletableFuture) {
+			CompletableFuture<T> future = (CompletableFuture<T>)result;
+			return future.whenComplete(new NRBiConsumer<>(holder));
+		}
+		holder.ignoreSegment();
+		return result;
 	}
 
 	@Trace

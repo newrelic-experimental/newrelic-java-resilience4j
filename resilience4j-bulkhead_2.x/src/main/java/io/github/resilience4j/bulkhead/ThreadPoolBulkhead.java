@@ -1,6 +1,7 @@
 package io.github.resilience4j.bulkhead;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Supplier;
 
@@ -10,7 +11,12 @@ import com.newrelic.api.agent.weaver.MatchType;
 import com.newrelic.api.agent.weaver.Weave;
 import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
+import com.newrelic.instrumentation.labs.bulkhead.NRBiConsumer;
+import com.newrelic.instrumentation.labs.bulkhead.NRCallableWrapper;
+import com.newrelic.instrumentation.labs.bulkhead.NRHolder;
+import com.newrelic.instrumentation.labs.bulkhead.NRRunnableWrapper;
 import com.newrelic.instrumentation.labs.bulkhead.ThreadPoolBulkheadMetricsCollector;
+import com.newrelic.instrumentation.labs.bulkhead.Utils;
 
 @Weave(type = MatchType.Interface)
 public abstract class ThreadPoolBulkhead implements AutoCloseable {
@@ -26,17 +32,40 @@ public abstract class ThreadPoolBulkhead implements AutoCloseable {
 
 	@Trace
 	public <T> CompletionStage<T> submit(Callable<T> task) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "ThreadPoolBulkhead", getName(),
-				"submitCallable");
-		return Weaver.callOriginal();
+		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "ThreadPoolBulkhead", getName(),"submit");
+		NRCallableWrapper<T> wrapper = Utils.getWrapper(task);
+		if(wrapper != null) {
+			task = wrapper;
+		}
+		NRHolder holder = new NRHolder("ThreadPoolBulkhead/submit");
+		holder.startSegment();
+
+		CompletionStage<T> completionStage = Weaver.callOriginal();
+		if(completionStage instanceof CompletableFuture) {
+			CompletableFuture<T> future = (CompletableFuture<T>) completionStage;
+			return future.whenComplete(new NRBiConsumer<T>(holder));
+		}
+		return completionStage;
 	}
 
 	@Trace
 	public CompletionStage<Void> submit(Runnable task) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "ThreadPoolBulkhead", getName(),
-				"submitRunnable");
-		return Weaver.callOriginal();
+		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "ThreadPoolBulkhead", getName(), "submitRunnable");
+		NRRunnableWrapper wrapper = Utils.getWrapper(task);
+		if(wrapper != null) {
+			task = wrapper;
+		}
+		NRHolder holder = new NRHolder("ThreadPoolBulkhead/submit");
+
+		CompletionStage<Void> completionStage = Weaver.callOriginal();
+		if(completionStage instanceof CompletableFuture) {
+			holder.startSegment();
+			CompletableFuture<Void> completableFuture =  (CompletableFuture<Void>) completionStage;
+			return completableFuture.whenComplete(new NRBiConsumer<Void>(holder));
+		}
+		return completionStage;
 	}
+
 
 	@Trace
 	public ThreadPoolBulkheadConfig getBulkheadConfig() {
