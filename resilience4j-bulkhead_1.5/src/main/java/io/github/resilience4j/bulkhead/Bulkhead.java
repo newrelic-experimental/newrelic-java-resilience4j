@@ -1,6 +1,7 @@
 package io.github.resilience4j.bulkhead;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -15,6 +16,10 @@ import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
 import com.newrelic.instrumentation.labs.bulkhead.BulkheadMetricsCollector;
 
+import com.newrelic.instrumentation.labs.bulkhead.NRBiConsumer;
+import com.newrelic.instrumentation.labs.bulkhead.NRErrorConsumer;
+import com.newrelic.instrumentation.labs.bulkhead.NRHolder;
+import com.newrelic.instrumentation.labs.bulkhead.NRResultConsumer;
 import io.vavr.CheckedConsumer;
 import io.vavr.CheckedFunction0;
 import io.vavr.CheckedFunction1;
@@ -43,16 +48,22 @@ public abstract class Bulkhead {
 
 	@Trace
 	public <T> T executeCheckedSupplier(CheckedFunction0<T> checkedSupplier) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
-				"executeCheckedSupplier");
+		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(), "executeCheckedSupplier");
 		return Weaver.callOriginal();
 	}
 
 	@Trace
 	public <T> CompletionStage<T> executeCompletionStage(Supplier<CompletionStage<T>> supplier) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
-				"executeCompletionStage");
-		return Weaver.callOriginal();
+		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(), "executeCompletionStage");
+		NRHolder holder = new NRHolder("Custom/Bulkhead/"+ getName() +"executeCompletionStage");
+		holder.startSegment();
+		CompletionStage<T> returnValue = Weaver.callOriginal();
+		if(returnValue instanceof CompletableFuture) {
+			CompletableFuture<T> future = (CompletableFuture<T>) returnValue;
+			return future.whenComplete(new NRBiConsumer<>(holder));
+		}
+		holder.ignoreSegment();
+		return returnValue;
 	}
 
 	@Trace
@@ -71,9 +82,12 @@ public abstract class Bulkhead {
 
 	@Trace
 	public <T> Try<T> executeTrySupplier(Supplier<Try<T>> supplier) {
-		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),
-				"executeTrySupplier");
-		return Weaver.callOriginal();
+		NewRelic.getAgent().getTracedMethod().setMetricName("Custom", "Resilience4j", "Bulkhead", getName(),"executeTrySupplier");
+		NRHolder holder = new NRHolder("Custom/Bulkhead/"+ getName() +"executeTrySupplier");
+		holder.startSegment();
+		Try<T> returnValue = Weaver.callOriginal();
+
+		return returnValue.onFailure(new NRErrorConsumer(holder)).onSuccess(new NRResultConsumer<>(holder));
 	}
 
 	@Trace

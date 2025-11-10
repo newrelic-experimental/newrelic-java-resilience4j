@@ -1,6 +1,7 @@
 package io.github.resilience4j.circuitbreaker;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -14,6 +15,8 @@ import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
 import com.newrelic.instruementation.labs.circuitbreaker.MetricsCollector;
 
+import com.newrelic.instruementation.labs.circuitbreaker.NRBiConsumer;
+import com.newrelic.instruementation.labs.circuitbreaker.NRHolder;
 import io.github.resilience4j.core.functions.CheckedRunnable;
 import io.github.resilience4j.core.functions.CheckedSupplier;
 
@@ -50,7 +53,15 @@ public abstract class CircuitBreaker {
 	@Trace
 	public <T> CompletionStage<T> executeCompletionStage(Supplier<CompletionStage<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeCompletionStage");
-		return Weaver.callOriginal();
+		NRHolder holder = new NRHolder("CircuitBreaker/"+getName()+"/CompletionStage");
+		holder.startSegment();
+		CompletionStage<T> completionStage = Weaver.callOriginal();
+		if(completionStage instanceof CompletableFuture) {
+			CompletableFuture<T> future = (CompletableFuture<T>) completionStage;
+			return future.whenComplete(new NRBiConsumer<T>(holder));
+		}
+		holder.ignoreSegment();
+		return completionStage;
 	}
 	
 	@Trace

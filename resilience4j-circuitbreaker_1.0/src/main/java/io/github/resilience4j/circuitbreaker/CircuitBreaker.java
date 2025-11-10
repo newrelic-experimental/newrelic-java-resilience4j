@@ -1,6 +1,7 @@
 package io.github.resilience4j.circuitbreaker;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -14,6 +15,10 @@ import com.newrelic.api.agent.weaver.WeaveAllConstructors;
 import com.newrelic.api.agent.weaver.Weaver;
 import com.newrelic.instruementation.labs.circuitbreaker.MetricsCollector;
 
+import com.newrelic.instruementation.labs.circuitbreaker.NRBiConsumer;
+import com.newrelic.instruementation.labs.circuitbreaker.NRErrorConsumer;
+import com.newrelic.instruementation.labs.circuitbreaker.NRHolder;
+import com.newrelic.instruementation.labs.circuitbreaker.NRResultConsumer;
 import io.vavr.CheckedFunction0;
 import io.vavr.CheckedRunnable;
 import io.vavr.control.Either;
@@ -52,7 +57,13 @@ public abstract class CircuitBreaker {
 	@Trace
 	public <T> CompletionStage<T> executeCompletionStage(Supplier<CompletionStage<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeCompletionStage");
-		return Weaver.callOriginal();
+		NRHolder holder = new NRHolder("CircuitBreaker/"+getName()+"/CompletionStage");
+		CompletionStage<T> completionStage = Weaver.callOriginal();
+		if(completionStage instanceof CompletableFuture) {
+			CompletableFuture<T> future = (CompletableFuture<T>) completionStage;
+			return future.whenComplete(new NRBiConsumer<T>(holder));
+		}
+		return completionStage;
 	}
 	
 	@Trace
@@ -76,7 +87,10 @@ public abstract class CircuitBreaker {
 	@Trace
 	public <T> Try<T> executeTrySupplier(Supplier<Try<T>> supplier) {
 		NewRelic.getAgent().getTracedMethod().setMetricName("Custom","Resilience4j","CircuitBreaker",getName(),"executeTrySupplier");
-		return Weaver.callOriginal();
+		Try<T> result = Weaver.callOriginal();
+		NRHolder holder = new NRHolder("CircuitBreaker/"+getName()+"/Try");
+		holder.startSegment();
+		return result.onSuccess(new NRResultConsumer<>(holder)).onFailure(new NRErrorConsumer(holder));
 	}
 	
 	@Trace

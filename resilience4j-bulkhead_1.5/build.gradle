@@ -25,5 +25,5 @@ jar {
 }
 
 verifyInstrumentation {
-  passes 'io.github.resilience4j:resilience4j-bulkhead:[1.5.0,2.0.0)'
+  passesOnly 'io.github.resilience4j:resilience4j-bulkhead:[1.4.0,2.0.0)'
 }
