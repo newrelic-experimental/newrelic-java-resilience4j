@@ -1,3 +1,6 @@
+## Version: [v1.0.3](https://github.com/newrelic-experimental/newrelic-java-resilience4j/releases/tag/v1.0.3) | Created: 2026-05-08
+
+
 ## Installation
 
 To install:
