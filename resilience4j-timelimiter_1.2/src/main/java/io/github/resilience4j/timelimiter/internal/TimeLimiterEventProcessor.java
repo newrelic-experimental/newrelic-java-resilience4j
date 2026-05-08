@@ -3,9 +3,10 @@ package io.github.resilience4j.timelimiter.internal;
 import com.newrelic.api.agent.NewRelic;
 import com.newrelic.api.agent.weaver.Weave;
 import com.newrelic.api.agent.weaver.Weaver;
-
 import io.github.resilience4j.timelimiter.event.TimeLimiterEvent;
-import io.github.resilience4j.timelimiter.event.TimeLimiterEvent.Type;;
+import io.github.resilience4j.timelimiter.event.TimeLimiterEvent.Type;
+
+;
 
 @Weave
 public class TimeLimiterEventProcessor {
